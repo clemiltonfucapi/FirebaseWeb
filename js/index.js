@@ -24,16 +24,42 @@ function cadastrarFeitico(){
     "nome": nomeFeitico,
     "nivel": nivel
   }
-  RTDatabase.addKeyValueNode('feiticos',feitico, limpar( [inFeitico,inNivel]));
-  //limpar os inputs
+ // RTDatabase.addKeyValueNode('feiticos',feitico, limpar( [inFeitico,inNivel]));
+  
+  //promise -> é uma promessa para inserir feitico no database
+  let promise = RTDatabase.addKeyValueNode('feiticos',feitico)
+  //se apromessa ocorreu com sucesso
+  promise.then( () => {
+    //limpar os inputs
+    limpar( [inFeitico, inNivel])
+    //mostrar um alerta
+    alert("Dados inseridos com sucesso!")
+  })
+ 
+  console.log('teste');
 
 }
+
 function limpar(array){
   array.forEach( (x ) =>{
     x.value ="";
   })
-  alert('dados inseridos com sucesso!')
+ 
 }
+
+function carregarFeiticos(){
+  RTDatabase.loadValueEvent('feiticos', (data) => {
+    console.log(data);
+
+    for(let indice in data){
+      let feitico = data[indice];
+      //console.log(feitico);
+      alert(feitico.nome + "," + feitico.nivel)
+    }
+    // inserir no
+  })
+}
+carregarFeiticos();
 
 console.log(app)
 console.log(database)
