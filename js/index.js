@@ -1,4 +1,4 @@
-// importar instancias app e database
+  // importar instancias app e database
 import {app,database} from './config.js'
 
 import {RTDatabase} from './classes/RTDatabase.js'
@@ -48,17 +48,49 @@ function limpar(array){
 }
 
 function carregarFeiticos(){
+ 
+
   RTDatabase.loadValueEvent('feiticos', (data) => {
     console.log(data);
+    let tbody = document.getElementById('tbody')
+    tbody.innerHTML=""
 
     for(let indice in data){
       let feitico = data[indice];
-      //console.log(feitico);
-      alert(feitico.nome + "," + feitico.nivel)
+      //console.log(feitico); 
+      //alert(feitico.nome + "," + feitico.nivel)
+
+      inserirFeiticoTabela(feitico)
     }
     // inserir no
   })
 }
+function inserirFeiticoTabela(feitico){
+  //
+  // recuperar tbody -> inserir linhas
+  let tbody = document.getElementById('tbody');
+
+  let linha = document.createElement("tr");
+  let colunas = []; // armazena os <td>
+
+  for(let prop in feitico){
+    // criar um td
+    let coluna = document.createElement('td')
+    // inserir o valor na coluna( <td>)
+    coluna.innerHTML = feitico[prop];
+    // inserir a coluna( <td> ) na linha
+    linha.appendChild(coluna)
+  }
+
+  let acoes = document.createElement('td');
+  acoes.innerHTML= '<span class="glyphicon glyphicon-remove"> </span>'
+  linha.appendChild(acoes);
+
+  //inserir linha na tabela
+  tbody.appendChild(linha)
+  
+}
+
 carregarFeiticos();
 
 console.log(app)

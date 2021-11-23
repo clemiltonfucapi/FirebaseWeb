@@ -3,7 +3,7 @@ class RTDatabase {
   static teste(){
     console.log("classe RT")
   }
-
+  // adicionar um valor em um nó
   static addKeyValueNode(nodePath, value){
     //criar/recuperar nó
     let refNode = ref( getDatabase(), nodePath ); 
