@@ -74,22 +74,46 @@ function inserirFeiticoTabela(feitico){
   let colunas = []; // armazena os <td>
 
   for(let prop in feitico){
-    // criar um td
-    let coluna = document.createElement('td')
-    // inserir o valor na coluna( <td>)
-    coluna.innerHTML = feitico[prop];
-    // inserir a coluna( <td> ) na linha
-    linha.appendChild(coluna)
+    //ignorar a coluna key
+    if(prop!='key'){
+      // criar um td
+      let coluna = document.createElement('td')
+      // inserir o valor na coluna( <td>)
+      coluna.innerHTML = feitico[prop];
+      // inserir a coluna( <td> ) na linha
+      linha.appendChild(coluna)
+
+    }
+
   }
 
   let acoes = document.createElement('td');
-  acoes.innerHTML= '<span class="glyphicon glyphicon-remove"> </span>'
+  acoes.innerHTML= `<span class="glyphicon glyphicon-remove" id="${feitico.key}"> </span>`
+  //selecionando o botao de excluir
+  let spanRemove = acoes.querySelector('.glyphicon-remove')
+  //adicionando evento de click 
+  spanRemove.addEventListener('click', () => {
+    // alert('excluir '+feitico.key);
+    removerFeitico(feitico.key)
+  })
+
   linha.appendChild(acoes);
 
   //inserir linha na tabela
   tbody.appendChild(linha)
   
 }
+
+function removerFeitico(key){
+  // recuperar a promessa de excluir
+  let promise = RTDatabase.removeNode('feiticos/'+key);
+
+  promise.then( () => {
+    alert('no removido!')
+  })
+
+}
+
 
 carregarFeiticos();
 

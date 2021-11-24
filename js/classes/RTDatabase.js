@@ -1,4 +1,4 @@
-import {getDatabase,ref,set, push, onValue} from 'https://www.gstatic.com/firebasejs/9.4.1/firebase-database.js'
+import {getDatabase,ref,set, push, onValue,remove} from 'https://www.gstatic.com/firebasejs/9.4.1/firebase-database.js'
 class RTDatabase {
   static teste(){
     console.log("classe RT")
@@ -9,7 +9,8 @@ class RTDatabase {
     let refNode = ref( getDatabase(), nodePath ); 
     //criando um novo id em nodePath
     let id = push(refNode)
-
+    
+    value.key = id.key;// adicionando a chave no objeto value
     //setar os valores no id
     // set é uma Promise -> requisicao assincrona
     return set(id, value);
@@ -32,6 +33,14 @@ class RTDatabase {
       callback(data);
 
     } )
+  }
+
+  static removeNode(nodePath){
+    // criar a referencia do nó
+    let refNode  = ref( getDatabase(),nodePath );
+
+    //retornar promise -> remover o nó
+    return remove(refNode);
   }
   
 }
