@@ -2,6 +2,8 @@
 import {app,database} from './config.js'
 
 import {RTDatabase} from './classes/RTDatabase.js'
+import {Storage} from './classes/Storage.js'
+
 RTDatabase.teste();
 
 let addFeitico = document.getElementById('addFeitico');
@@ -114,6 +116,52 @@ function removerFeitico(key){
 
 }
 
+var infoImg;
+
+let input = document.getElementById('inputPhoto');
+input.addEventListener('change', (e) => {
+  //capturando info. da imagem
+  infoImg =  e.target.files[0];
+
+  let leitorImg = new FileReader();
+  leitorImg.readAsDataURL(infoImg)
+  // load -> executa callback quando imagem carregada
+  leitorImg.addEventListener('load', () => {
+    //seleciona <img>
+    let photo = document.getElementById('photo');
+    photo.style.display = 'block'; // aparece elemento
+    photo.src = leitorImg.result; // seta a imagem carregada
+  });
+})
+
+let btnUpload = document.getElementById('btnUpload');
+btnUpload.addEventListener('click', () =>{
+  uploadProcess();
+})
+
+function uploadProcess(){
+  //recuperar a extensao e o nome da imagem
+  let ext = getExtName(infoImg);
+  let nome = getFileName(infoImg);
+  //caminho da imagem no storage
+  let path = 'images/' + nome + ext;
+  
+  Storage.uploadBytes(path,infoImg);
+  
+}
+
+function getExtName(file){
+  let temp = file.name.split('.');
+  let ext = temp.slice(  temp.length -1 , temp.length );
+  return '.' + ext[0];
+} 
+// "0,1,3,4" => split(',') => [0,1,2,4]
+//[0,1,2,3] => join('.') => "0.1.2.3"
+function getFileName(file){
+  let temp = file.name.split('.');
+  let fname = temp.slice(0,-1).join('.');
+  return fname;
+}
 
 carregarFeiticos();
 

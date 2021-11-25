@@ -11,7 +11,15 @@
     <!-- Optional theme -->
     <link rel="stylesheet" href="./css/bootstrap-theme.min.css">
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css" rel="stylesheet">
-    <lik rel="stylesheet" href="./css/style.css"/>
+    
+    <style>
+      img{
+        height :200px;
+        width: 200px;
+        border: 2px;
+        margin: 10px;
+      }
+    </style>
     <!-- Latest compiled and minified JavaScript -->
 </head>
 
@@ -28,7 +36,9 @@
                 <br/>
 
                 <div  class="custom-file"> 
-                    <input type="file" id="photo" class="custom-file-input"/>
+                    <input type="file" id="inputPhoto" class="custom-file-input"/>
+                    <img id="photo" style="display:none;">
+                    <button id="btnUpload">Upload</button>
                 </div>
                 
             </div>
