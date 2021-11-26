@@ -18,6 +18,9 @@ class Storage{
       return uploadBytesResumable(storageRef,bytes);
 
   }
+  static getDownloadURL(uploadTask){
+      return getDownloadURL(uploadTask.snapshot.ref);
+  }
 
 }
 

@@ -1,8 +1,27 @@
-import {getDatabase,ref,set, push, onValue,remove} from 'https://www.gstatic.com/firebasejs/9.4.1/firebase-database.js'
+import {getDatabase,ref,set, push, onValue,remove, update} 
+from 'https://www.gstatic.com/firebasejs/9.4.1/firebase-database.js'
+
 class RTDatabase {
   static teste(){
     console.log("classe RT")
   }
+  /* 
+    - nodePath: Caminho do no -> feiticos/-Mqd13cd
+    - key: a chave do novo valor -> "url"
+    - value: valor a ser inserido -> "https://..."
+  */
+  static updateNode(nodePath,value){
+    //referencia do no
+    let refNode = ref(getDatabase(), nodePath);
+    // novo valor a ser inserido
+    let updates = {
+      url:value
+    }
+    // atualizacao de refNode
+    return update(refNode, updates);
+  }
+
+
   // adicionar um valor em um nó
   static addKeyValueNode(nodePath, value){
     //criar/recuperar nó
@@ -13,7 +32,7 @@ class RTDatabase {
     value.key = id.key;// adicionando a chave no objeto value
     //setar os valores no id
     // set é uma Promise -> requisicao assincrona
-    return set(id, value);
+    return {promise: set(id, value), key: id.key};
   }
   /* 
     Carregar TODOS os dados em nodePath quando 

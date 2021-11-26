@@ -29,13 +29,20 @@ function cadastrarFeitico(){
  // RTDatabase.addKeyValueNode('feiticos',feitico, limpar( [inFeitico,inNivel]));
   
   //promise -> é uma promessa para inserir feitico no database
-  let promise = RTDatabase.addKeyValueNode('feiticos',feitico)
+  // destructuring object
+  let {promise,key} = RTDatabase.addKeyValueNode('feiticos',feitico)
   //se apromessa ocorreu com sucesso
   promise.then( () => {
     //limpar os inputs
     limpar( [inFeitico, inNivel])
     //mostrar um alerta
-    alert("Dados inseridos com sucesso!")
+    if(infoImg){
+      uploadImagem(key)
+    }else{
+      alert("Dados inseridos com sucesso!")
+    }
+
+    
   })
  
   console.log('teste');
@@ -134,21 +141,46 @@ input.addEventListener('change', (e) => {
   });
 })
 
+/*
 let btnUpload = document.getElementById('btnUpload');
 btnUpload.addEventListener('click', () =>{
   uploadProcess();
 })
+*/
 
-function uploadProcess(){
+function uploadImagem(key){
   //recuperar a extensao e o nome da imagem
   let ext = getExtName(infoImg);
   let nome = getFileName(infoImg);
   //caminho da imagem no storage
   let path = 'images/' + nome + ext;
   
-  Storage.uploadBytes(path,infoImg);
+  let uploadTask = Storage.uploadBytes(path,infoImg);
+  let progress = document.getElementById('progress');
+  progress.style.display="block";
+  uploadTask.on('state-changed',
+    (snapshot) => { // 1º callback -> progresso
+      let perc = (  snapshot.bytesTransferred / snapshot.totalBytes )*100;
+      progress.innerHTML = "Upload: "+ perc + "%";
+    },
+    (error) => {
+      alert('image not uploaded')
+    },
+    () => { // upload realizado com sucesso
+      let promiseUrl = Storage.getDownloadURL(uploadTask)
+      promiseUrl.then( (photoUrl) =>{
+        //console.log(url)
+
+        // inserir a url, no novo nó
+        let promise = RTDatabase.updateNode('feiticos/'+key,photoUrl)
+        promise.then( () => {
+          alert("Upload realizado com sucesso!")
+        })
+      })
+    }
+  )
   
-}
+} 
 
 function getExtName(file){
   let temp = file.name.split('.');
