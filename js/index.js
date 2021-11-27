@@ -24,7 +24,8 @@ function cadastrarFeitico(){
   } 
   let feitico = {
     "nome": nomeFeitico,
-    "nivel": nivel
+    "nivel": nivel,
+    "votou": false,
   }
  // RTDatabase.addKeyValueNode('feiticos',feitico, limpar( [inFeitico,inNivel]));
   
@@ -80,11 +81,11 @@ function inserirFeiticoTabela(feitico){
   let tbody = document.getElementById('tbody');
 
   let linha = document.createElement("tr");
-  let colunas = []; // armazena os <td>
 
+  let propsFeiticos = ['nivel', 'nome']; // somente esses atributos irão aparecer na tabela
   for(let prop in feitico){
     //ignorar a coluna key
-    if(prop!='key'){
+    if(propsFeiticos.indexOf(prop)!=-1){
       // criar um td
       let coluna = document.createElement('td')
       // inserir o valor na coluna( <td>)
@@ -97,7 +98,9 @@ function inserirFeiticoTabela(feitico){
   }
 
   let acoes = document.createElement('td');
-  acoes.innerHTML= `<span class="glyphicon glyphicon-remove" id="${feitico.key}"> </span>`
+  acoes.innerHTML= `<span  class="glyphicon glyphicon-check"  user="${feitico.key}" data-bs-toggle="modal" data-bs-target="#modalVotou"> </span> 
+  <span class="glyphicon glyphicon-picture" url= ${feitico.url}> </span>
+  <span class="glyphicon glyphicon-remove" id="${feitico.key}"> </span>`
   //selecionando o botao de excluir
   let spanRemove = acoes.querySelector('.glyphicon-remove')
   //adicionando evento de click 
@@ -106,12 +109,50 @@ function inserirFeiticoTabela(feitico){
     removerFeitico(feitico.key)
   })
 
+  let spanPicture = acoes.querySelector('.glyphicon-picture');
+  spanPicture.addEventListener('click', () =>{
+    let url = spanPicture.getAttribute('url');
+    showModal(url, feitico.nome);
+  })
+
+  let spanUrna = acoes.querySelector('.glyphicon-check');
+  if(!feitico.votou){
+    spanUrna.setAttribute('data-bs-target','#exampleModal' )
+  }else{
+    spanUrna.setAttribute('data-bs-target','#modalVotou')
+  }
+
+
   linha.appendChild(acoes);
 
   //inserir linha na tabela
   tbody.appendChild(linha)
   
 }
+
+
+function showModal(src, alt){
+  // Get the modal
+  let modal = document.getElementById("myModal");
+
+  let modalImg = document.getElementById("img01");
+  let captionText = document.getElementById("caption");
+  
+  
+    modal.style.display = "block";
+    modalImg.src = src;
+    captionText.innerHTML = alt;
+    // Get the <span> element that closes the modal
+  var span = document.getElementsByClassName("close")[0];
+
+  // When the user clicks on <span> (x), close the modal
+  span.onclick = function() {
+    modal.style.display = "none";
+  }
+}
+
+  
+
 
 function removerFeitico(key){
   // recuperar a promessa de excluir
@@ -140,13 +181,6 @@ input.addEventListener('change', (e) => {
     photo.src = leitorImg.result; // seta a imagem carregada
   });
 })
-
-/*
-let btnUpload = document.getElementById('btnUpload');
-btnUpload.addEventListener('click', () =>{
-  uploadProcess();
-})
-*/
 
 function uploadImagem(key){
   //recuperar a extensao e o nome da imagem
