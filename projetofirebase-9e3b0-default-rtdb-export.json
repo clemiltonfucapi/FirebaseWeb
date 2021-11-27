@@ -1,0 +1,33 @@
+{
+  "candidatos" : {
+    "-1" : {
+      "nome" : "Nulo",
+      "numero" : 20,
+      "qtdVotos" : 0
+    },
+    "0" : {
+      "nome" : "Branco",
+      "numero" : 0,
+      "qtdVotos" : 0
+    },
+    "20" : {
+      "nome" : "Batman",
+      "numero" : 20,
+      "qtdVotos" : 0
+    },
+    "31" : {
+      "nome" : "Super Homem",
+      "numero" : 31,
+      "qtdVotos" : 0
+    }
+  },
+  "urnas" : [ {
+    "id" : 0,
+    "nome" : "Urna 1",
+    "status" : "DISPONIVEL"
+  }, {
+    "id" : 1,
+    "nome" : "Urna 2",
+    "status" : "DISPONIVEL"
+  } ]
+}

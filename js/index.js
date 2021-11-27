@@ -4,6 +4,7 @@ import {app,database} from './config.js'
 import {RTDatabase} from './classes/RTDatabase.js'
 import {Storage} from './classes/Storage.js'
 
+
 RTDatabase.teste();
 
 let addFeitico = document.getElementById('addFeitico');
@@ -11,31 +12,31 @@ addFeitico.addEventListener( 'click', cadastrarFeitico);
 
 function cadastrarFeitico(){
   // recuperando input's
-  let inFeitico = document.getElementById('inFeitico');
-  let inNivel = document.getElementById('inNivel')
+  let inNome = document.getElementById('inNome');
+  let inRG = document.getElementById('inRG')
 
   // recuperar valores
-  let nomeFeitico = inFeitico.value;
-  let nivel = inNivel.value;
+  let nome = inNome.value;
+  let rg = inRG.value;
 
-  if(nomeFeitico=="" || nivel==""){
+  if(nome=="" || rg==""){
     alert('preencha os dois campos!!');
     return;
   } 
-  let feitico = {
-    "nome": nomeFeitico,
-    "nivel": nivel,
-    "votou": false,
+  let eleitor = {
+    "nome": nome,
+    "rg": rg,
+    "status": "NAO_VOTOU",
   }
  // RTDatabase.addKeyValueNode('feiticos',feitico, limpar( [inFeitico,inNivel]));
   
   //promise -> é uma promessa para inserir feitico no database
   // destructuring object
-  let {promise,key} = RTDatabase.addKeyValueNode('feiticos',feitico)
+  let {promise,key} = RTDatabase.addKeyValueNode('eleitores',eleitor)
   //se apromessa ocorreu com sucesso
   promise.then( () => {
     //limpar os inputs
-    limpar( [inFeitico, inNivel])
+    limpar( [inNome, inRG])
     //mostrar um alerta
     if(infoImg){
       uploadImagem(key)
@@ -45,8 +46,6 @@ function cadastrarFeitico(){
 
     
   })
- 
-  console.log('teste');
 
 }
 
@@ -57,11 +56,13 @@ function limpar(array){
  
 }
 
+var ELEITORES;
 function carregarFeiticos(){
- 
 
-  RTDatabase.loadValueEvent('feiticos', (data) => {
-    console.log(data);
+  RTDatabase.loadValueEvent('eleitores', (data) => {
+    
+    ELEITORES = data;
+
     let tbody = document.getElementById('tbody')
     tbody.innerHTML=""
 
@@ -75,6 +76,8 @@ function carregarFeiticos(){
     // inserir no
   })
 }
+
+
 function inserirFeiticoTabela(feitico){
   //
   // recuperar tbody -> inserir linhas
@@ -82,21 +85,17 @@ function inserirFeiticoTabela(feitico){
 
   let linha = document.createElement("tr");
 
-  let propsFeiticos = ['nivel', 'nome']; // somente esses atributos irão aparecer na tabela
-  for(let prop in feitico){
-    //ignorar a coluna key
-    if(propsFeiticos.indexOf(prop)!=-1){
-      // criar um td
+  let propsFeiticos = ['rg', 'nome']; // somente esses atributos irão aparecer na tabela
+  //inserir colunas na tabela
+  propsFeiticos.forEach( (prop )=> {
+    // criar um td
       let coluna = document.createElement('td')
       // inserir o valor na coluna( <td>)
       coluna.innerHTML = feitico[prop];
       // inserir a coluna( <td> ) na linha
       linha.appendChild(coluna)
-
-    }
-
-  }
-
+  });
+  //inserir acoes
   let acoes = document.createElement('td');
   acoes.innerHTML= `<span  class="glyphicon glyphicon-check"  user="${feitico.key}" data-bs-toggle="modal" data-bs-target="#modalVotou"> </span> 
   <span class="glyphicon glyphicon-picture" url= ${feitico.url}> </span>
@@ -116,11 +115,23 @@ function inserirFeiticoTabela(feitico){
   })
 
   let spanUrna = acoes.querySelector('.glyphicon-check');
-  if(!feitico.votou){
-    spanUrna.setAttribute('data-bs-target','#exampleModal' )
-  }else{
-    spanUrna.setAttribute('data-bs-target','#modalVotou')
-  }
+  
+  spanUrna.addEventListener('click', () => {
+    //adicionando key do usuario no modal
+    let inputUser = document.getElementById('inputUser')
+    inputUser.value = feitico.key;
+  })
+  if(feitico.status=="NAO_VOTOU"){
+      spanUrna.setAttribute('data-bs-target','#modalUrna' )
+    }else{
+      let modalText = document.getElementById('modalVotouText')
+      if(feitico.status=="VOTANDO"){
+        modalText.innerHTML="Eleitor está votando!";
+      }else{
+        modalText.innerHTML="Eleitor já votou!";
+      }
+      spanUrna.setAttribute('data-bs-target','#modalVotou')
+    }
 
 
   linha.appendChild(acoes);
@@ -156,7 +167,7 @@ function showModal(src, alt){
 
 function removerFeitico(key){
   // recuperar a promessa de excluir
-  let promise = RTDatabase.removeNode('feiticos/'+key);
+  let promise = RTDatabase.removeNode('eleitores/'+key);
 
   promise.then( () => {
     alert('no removido!')
@@ -205,8 +216,12 @@ function uploadImagem(key){
       promiseUrl.then( (photoUrl) =>{
         //console.log(url)
 
+        let updates = {
+          url: photoUrl
+        } 
+
         // inserir a url, no novo nó
-        let promise = RTDatabase.updateNode('feiticos/'+key,photoUrl)
+        let promise = RTDatabase.updateNode('eleitores/'+key,updates)
         promise.then( () => {
           alert("Upload realizado com sucesso!")
         })
@@ -231,5 +246,98 @@ function getFileName(file){
 
 carregarFeiticos();
 
-console.log(app)
-console.log(database)
+
+/* carregar urnas */
+var arrayUrnas;
+RTDatabase.loadValueEvent('urnas', (arr) =>{
+  arrayUrnas = arr;
+  let selectUrnas = document.getElementById('selectUrnas')
+  
+  let strHtml =""
+  arr.forEach( (urna) => {
+    console.log(urna);
+
+    strHtml += `<option value="${urna.id}">${urna.nome}</option>`
+  })
+
+  selectUrnas.innerHTML = strHtml;
+});
+
+// ativar uma urna 
+let btnAtivarUrna = document.getElementById('btnAtivarUrna');
+btnAtivarUrna.addEventListener('click', () => {
+
+  //recuperando primeira modal -> selecionar urma
+  let myModalEl = document.getElementById('modalUrna')
+  let modal = bootstrap.Modal.getInstance(myModalEl)
+
+  //modal de confirmação
+  let modalConfirm = new bootstrap.Modal(document.getElementById('modalConfirm'), {
+    keyboard: false
+  })
+
+
+  //recuperar item selecionado da primeira modal
+  let option = document.querySelector('#selectUrnas option:checked')
+  let urnaSelecionada = arrayUrnas[option.value];
+
+
+  
+  //verificar se a urna está livre
+  if(urnaSelecionada.status=='DISPONIVEL'){
+    //modifica o nó da urna no firebase
+
+    let inputUser = document.getElementById('inputUser');
+
+    let eleitor = ELEITORES[inputUser.value]
+    let updates = {
+      'status': 'OCUPADA',
+      eleitor: eleitor
+    }
+    RTDatabase.updateNode('eleitores/'+eleitor.key, {
+      'status':'VOTANDO'
+    });
+
+
+    //atualizar no da urna para OCUPADA
+    RTDatabase.updateNode('urnas/'+urnaSelecionada.id,updates)
+    .then( () => {
+      //adicionar mensagem no html
+      document.getElementById('modalConfirmTitle').innerHTML=urnaSelecionada.nome
+      document.getElementById('modalConfirmText').innerHTML="Urna foi ativada"
+
+      //mostrar modal
+      modal.hide();
+      modalConfirm.show();
+
+    })
+
+
+    
+  }else{
+
+    //adicionar mensagem html
+    document.getElementById('modalConfirmTitle').innerHTML=urnaSelecionada.nome
+    document.getElementById('modalConfirmText').innerHTML="Urna está em uso!"
+
+    //mostrar modal
+    modal.hide();
+    modalConfirm.show();
+  }
+
+  //criando segunda modal
+  
+  
+  modal.hide();
+
+  modalConfirm.show();
+  /*
+  btnAtivarUrna.setAttribute('data-bs-target','#modalConfirm' )
+  btnAtivarUrna.setAttribute('data-bs-toggle','modal')
+  btnAtivarUrna.setAttribute('data-bs-dismiss','modal')*/
+    
+}) 
+
+
+
+

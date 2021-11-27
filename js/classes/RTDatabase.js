@@ -10,16 +10,16 @@ class RTDatabase {
     - key: a chave do novo valor -> "url"
     - value: valor a ser inserido -> "https://..."
   */
-  static updateNode(nodePath,value){
+  static updateNode(nodePath,updates){
     //referencia do no
     let refNode = ref(getDatabase(), nodePath);
     // novo valor a ser inserido
-    let updates = {
-      url:value
-    }
+   
     // atualizacao de refNode
     return update(refNode, updates);
   }
+
+  
 
 
   // adicionar um valor em um nó

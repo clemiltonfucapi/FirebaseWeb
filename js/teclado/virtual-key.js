@@ -11,6 +11,11 @@ $(document).ready(function(){
 			
       if(command=="Corrige"){
         campo.value="";
+        $('#campo').trigger('change')
+        return;
+      }else if(command=="Branco"){
+        campo.value="0";
+        $('#campo').trigger("change");
         return;
       }
       
@@ -20,7 +25,10 @@ $(document).ready(function(){
         console.log('somente dois digitos')
         return;
       }
-			$('#campo').val($('#campo').val() + number).focus();
+      //escreve
+			$('#campo').val($('#campo').val() + number).trigger("change");
+
+
 		}
 	});
 });
