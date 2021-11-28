@@ -85,7 +85,7 @@ function inserirFeiticoTabela(feitico){
 
   let linha = document.createElement("tr");
 
-  let propsFeiticos = ['rg', 'nome']; // somente esses atributos irão aparecer na tabela
+  let propsFeiticos = ['rg', 'nome','status']; // somente esses atributos irão aparecer na tabela
   //inserir colunas na tabela
   propsFeiticos.forEach( (prop )=> {
     // criar um td
@@ -175,8 +175,10 @@ function removerFeitico(key){
 
 }
 
+ /* ---------- CONFIGURACAO DA FOTO/CAMERA ------------ */
 var infoImg;
 
+// FOTO
 let input = document.getElementById('inputPhoto');
 input.addEventListener('change', (e) => {
   //capturando info. da imagem
@@ -193,8 +195,62 @@ input.addEventListener('change', (e) => {
   });
 })
 
+// CAMERA
+var btnCamera = document.getElementById('btnCamera')
+var video = document.querySelector('#video');
+var localstream;
+
+btnCamera.addEventListener('click',function () {
+  navigator.mediaDevices.getUserMedia({
+    video: true
+  }).then(function (stream) {
+    
+    localstream = stream;
+    video.srcObject = stream;
+    
+    video.play();
+  })
+
+  document.querySelector('#capture').addEventListener('click', function (e) {
+  
+    var canvas = document.createElement("canvas");
+    
+    canvas.height = video.videoHeight;
+    canvas.width = video.videoWidth;
+    
+    var context = canvas.getContext('2d');
+    
+    context.drawImage(video, 0, 0)
+
+    let dataUrl = canvas.toDataURL()
+
+    let photo = document.getElementById('photo');
+    photo.src = dataUrl;
+    infoImg = dataUrl;
+    photo.style.display="block";
+
+    vidOff();
+  })
+}) 
+
+function vidOff() {
+    //clearInterval(theDrawLoop);
+  //ExtensionData.vidStatus = 'off';
+  video.pause();
+  video.src = "";
+  localstream.getTracks()[0].stop();
+  console.log("Vid off");
+}
+
+
+
 function uploadImagem(key){
   //recuperar a extensao e o nome da imagem
+  if(typeof(infoImg)=='string'){
+    uploadImagemBase64(key);
+    return;
+  }
+
   let ext = getExtName(infoImg);
   let nome = getFileName(infoImg);
   //caminho da imagem no storage
@@ -231,6 +287,60 @@ function uploadImagem(key){
   
 } 
 
+
+function dataURItoBlob(dataURI) {
+    var byteString;
+    if (dataURI.split(',')[0].indexOf('base64') >= 0){
+        byteString = atob(dataURI.split(',')[1]);
+    }
+    else{
+        byteString = unescape(dataURI.split(',')[1]);
+    }
+    var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+    var ia = new Uint8Array(byteString.length);
+    for (var i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+    }
+    return new Blob([ia], {type:mimeString});
+}
+
+function uploadImagemBase64(key){
+  let time = new Date().getTime()
+  let path="/images/base64-"+time+".png"
+  let file = dataURItoBlob(infoImg);
+
+  //let uri = infoImg;
+ // let base64 = infoImg.replace(/^data:image\/(png|jpg);base64,/, "");
+  let uploadTask = Storage.uploadBytes(path,file);
+  let progress = document.getElementById('progress');
+  progress.style.display="block";
+  uploadTask.on('state-changed',
+    (snapshot) => { // 1º callback -> progresso
+      let perc = (  snapshot.bytesTransferred / snapshot.totalBytes )*100;
+      progress.innerHTML = "Upload: "+ perc + "%";
+    },
+    (error) => {
+      alert('image not uploaded')
+    },
+    () => { // upload realizado com sucesso
+      let promiseUrl = Storage.getDownloadURL(uploadTask)
+      promiseUrl.then( (photoUrl) =>{
+        //console.log(url)
+
+        let updates = {
+          url: photoUrl
+        } 
+
+        // inserir a url, no novo nó
+        let promise = RTDatabase.updateNode('eleitores/'+key,updates)
+        promise.then( () => {
+          alert("Upload realizado com sucesso!")
+        })
+      })
+    }
+  )
+  
+}
 function getExtName(file){
   let temp = file.name.split('.');
   let ext = temp.slice(  temp.length -1 , temp.length );

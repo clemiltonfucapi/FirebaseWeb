@@ -1,10 +1,6 @@
 $(document).ready(function(){
-	$('.table_teclado tr td').click(function(){
-
-
+	$('.col-4 .row button').click(function(){
     let campo = $('#campo')[0];
-    
-
 		var command = $(this).text();
     let number = Number(command)
 		if (isNaN(number)){

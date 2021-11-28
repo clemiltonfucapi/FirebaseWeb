@@ -36,11 +36,21 @@
             <input type="text" class="form-control" id="inNome"> 
           </div>
 
-          <div class="mb-3 px-2 w-10">
+        
+          <div class="mb-3 px-2 row">
             <label for="formFile" class="form-label">Insira uma foto </label>
-            <input class="form-control" type="file" id="inputPhoto">
+            <div class="col-3">
+              
+            <input class="form-control " type="file" id="inputPhoto">
+            </div>
+            <div class="col">
+              <button class="btn btn-primary" id="btnCamera" data-bs-toggle="modal" data-bs-target="#modalCamera">Tirar Foto</button>
+            </div>
+            
           </div>
-          <img  class="img-thumbnail"  style="display:none;" id="photo">
+
+        
+          <img  class="img-thumbnail"  style="display:none; width:30%" id="photo">
           <h5 id="progress" style="display:none;" >Progresso: </h5>
            <button type="submit" class="btn btn-primary" id="addFeitico">Cadastrar</button>
 </button>
@@ -49,6 +59,7 @@
  
 
     <div class="container col-md-12">
+        <h1>Eleitores</h1>
         <div class="panel panel-default">
             <div class="panel-body">
                 <table class="table">
@@ -57,6 +68,7 @@
       
                             <th>Identidade</th>
                             <th>Nome Completo</th>
+                            <th>Status </th>
                             <th>Ações</th>
                         </tr>
                     </thead>
@@ -74,16 +86,28 @@
 
       <!-- The Modal -->
     <div id="myModal" class="modal-img">
-
       <!-- The Close Button -->
       <span class="close">&times;</span>
-
       <!-- Modal Content (The Image) -->
       <img class="modal-content-img" id="img01">
 
       <!-- Modal Caption (Image Text) -->
       <div id="caption"></div>
     </div>
+
+<!-- Modal camera -->
+<div class="modal fade" id="modalCamera" tabindex="-1" aria-labelledby="modalCamera" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-body text-center" id="modalCameraContent" >
+        <video id="video" style="width: 75%;"></video> <br>
+        <button id="capture" class="btn btn-primary" data-bs-dismiss="modal">
+          Capture
+        </button> 
+      </div>
+    </div>
+  </div>
+</div>
 
 
     
@@ -141,6 +165,8 @@
 
 </body>
 
+
 <script type="module"  src="js/index.js"> </script>
+<script src="js/camera.js"></script>
 
 </html>

@@ -11,17 +11,20 @@ var textNomeVoto = document.getElementById("textNomeVoto");
 
 var confirmaVoto = document.getElementById("confirmaVoto");
 
+var progressbar = document.getElementById("progressbar");
 var KEY_VOTO;
 inputVoto.onchange  = () => {
   console.log(inputVoto.value)
   let strVoto = inputVoto.value;
+  //SEM VOTO
   if(strVoto==""){
     textNomeVoto.innerHTML="Seu voto: "
     KEY_VOTO="";
     return
-  }else if(strVoto=="0"){
+  }else if(strVoto=="0"){ // VOTO BRANCO
     textNomeVoto.innerHTML="Seu voto: BRANCO"
     KEY_VOTO="0"
+    return;
   }
 
   if(!CANDIDATOS[strVoto]){
@@ -44,16 +47,22 @@ RTDatabase.loadValueEvent('candidatos',(data) => {
   CANDIDATOS=data;
 })
 
+
 function carregarUrna(){
   RTDatabase.loadValueEvent('urnas/'+CODIGO_URNA,(data)=>{
-    let urna = data;
+  
 
+    let urna = data;
+    
     if(urna.status=="DISPONIVEL"){
       divWaiting.style.display="block"
       divVotacao.style.display="none"
+
     }else if ( urna.status=="OCUPADA"){
       divWaiting.style.display="none"
       divVotacao.style.display="block"
+      inputVoto.value=""
+      textNomeVoto.innerHTML=""
       INFO_URNA=urna;
     }
   })
@@ -90,6 +99,8 @@ confirmaVoto.addEventListener("click", () => {
     })
   })
 })
+
+
 
 
 carregarUrna();
