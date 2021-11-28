@@ -7,15 +7,17 @@
 
   // Your web app's Firebase configuration
   // Your web app's Firebase configuration
-  const firebaseConfig = {
-    apiKey: "AIzaSyD_0Asa132QLOeSkpeR4FSYyQlzonxey9U",
-    authDomain: "projetofirebase-9e3b0.firebaseapp.com",
-    databaseURL: "https://projetofirebase-9e3b0-default-rtdb.firebaseio.com",
-    projectId: "projetofirebase-9e3b0",
-    storageBucket: "projetofirebase-9e3b0.appspot.com",
-    messagingSenderId: "28738757028",
-    appId: "1:28738757028:web:e012f75d6e43f1f3886131"
-  };
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyDt5K4u72Yn3wiOidQUytOsgxFpklGERIk",
+  authDomain: "feiticosfirebase.firebaseapp.com",
+  databaseURL: "https://feiticosfirebase-default-rtdb.firebaseio.com",
+  projectId: "feiticosfirebase",
+  storageBucket: "feiticosfirebase.appspot.com",
+  messagingSenderId: "480393444763",
+  appId: "1:480393444763:web:fd1043f5e7b9dd2a67f53e"
+};
+
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
   // recupera real time database
